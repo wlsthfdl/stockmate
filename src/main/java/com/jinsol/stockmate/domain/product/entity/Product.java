@@ -1,5 +1,6 @@
 package com.jinsol.stockmate.domain.product.entity;
 
+import com.jinsol.stockmate.domain.category.entity.Category;
 import com.jinsol.stockmate.domain.product.enums.ProductStatus;
 import com.jinsol.stockmate.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -33,6 +34,10 @@ public class Product extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Builder
     public Product(String name, String description, int price, String currency, ProductStatus status) {
