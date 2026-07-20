@@ -36,10 +36,15 @@ public class OrderItem extends BaseEntity {
     private int price;
 
     @Builder
-    public OrderItem(Order order, Product product, int quantity, int price) {
-        this.order = order;
+    public OrderItem(Product product, int quantity, int price) {
         this.product = product;
         this.quantity = quantity;
         this.price = price;
     }
+
+    //연관관계 편의 메서드 (Order쪽에서만 호출되도록 설게)
+    void assignOrder(Order order){
+        this.order=order;
+    }
+
 }
