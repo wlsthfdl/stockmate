@@ -40,12 +40,13 @@ public class Product extends BaseEntity {
     private Category category;
 
     @Builder
-    public Product(String name, String description, int price, String currency, ProductStatus status) {
+    public Product(String name, String description, int price, String currency, ProductStatus status, Category category) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.currency = currency;
         this.status = status;
+        this.category = category;
     }
 
     public void changeName(String name) {
