@@ -73,8 +73,14 @@ public class ProductService {
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
             product.changeCategory(category);
         }
-    return new ProductResponse(product);
-
+        return new ProductResponse(product);
     }
 
+    //상품 삭제
+    @Transactional
+    public void deleteProduct(Long productId){
+        Product product = productRepository.findById(productId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        productRepository.delete(product);
+    }
 }
