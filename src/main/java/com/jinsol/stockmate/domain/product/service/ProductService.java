@@ -2,6 +2,8 @@ package com.jinsol.stockmate.domain.product.service;
 
 import com.jinsol.stockmate.domain.category.entity.Category;
 import com.jinsol.stockmate.domain.category.repository.CategoryRepository;
+import com.jinsol.stockmate.domain.inventory.entity.Inventory;
+import com.jinsol.stockmate.domain.inventory.repository.InventoryRepository;
 import com.jinsol.stockmate.domain.product.dto.ProductCreateRequest;
 import com.jinsol.stockmate.domain.product.dto.ProductResponse;
 import com.jinsol.stockmate.domain.product.dto.ProductUpdateRequest;
@@ -19,6 +21,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final InventoryRepository inventoryRepository;
 
     //상품 등록
     @Transactional
@@ -36,6 +39,14 @@ public class ProductService {
                 .build();
 
         Product saveProduct = productRepository.save(product);
+
+        //재고 자동생성
+        Inventory inventory = Inventory.builder()
+                .product(saveProduct)
+                .quantity(0)
+                .build();
+        inventoryRepository.save(inventory);
+
         return new ProductResponse(saveProduct);
     }
 
