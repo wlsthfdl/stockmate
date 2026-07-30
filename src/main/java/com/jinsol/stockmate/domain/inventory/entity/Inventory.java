@@ -40,6 +40,7 @@ public class Inventory extends BaseEntity {
         this.quantity =quantity;
     }
 
+    //행위 기반 수정 API를 위함(검증 포함. 캡슐화)
     public void increase(int amount){
         this.quantity += amount;
     }

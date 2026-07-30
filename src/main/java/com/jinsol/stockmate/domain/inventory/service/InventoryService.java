@@ -18,7 +18,7 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
 
     //재고 단건 조회
-    public InventoryResponse getInventoryByProductId(Long productId, InventoryAdjustRequest request){
+    public InventoryResponse getInventoryByProductId(Long productId){
         Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재고입니다."));
         return new InventoryResponse(inventory);
