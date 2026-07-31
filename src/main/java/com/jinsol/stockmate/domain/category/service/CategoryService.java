@@ -5,6 +5,7 @@ import com.jinsol.stockmate.domain.category.dto.CategoryResponse;
 import com.jinsol.stockmate.domain.category.entity.Category;
 import com.jinsol.stockmate.domain.category.repository.CategoryRepository;
 import com.jinsol.stockmate.domain.product.dto.ProductResponse;
+import com.jinsol.stockmate.global.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class CategoryService {
     @Transactional
     public CategoryResponse updateCategory(Long categoryId, CategoryRequest request){
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+                .orElseThrow(()->new EntityNotFoundException("존재하지 않는 카테고리입니다."));
 
         category.changeName(request.getName());
 
@@ -52,7 +53,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long categoryId){
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 카테고리입니다."));
         categoryRepository.delete(category);
     }
 

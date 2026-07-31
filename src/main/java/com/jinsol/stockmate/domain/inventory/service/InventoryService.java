@@ -4,6 +4,8 @@ import com.jinsol.stockmate.domain.inventory.dto.InventoryAdjustRequest;
 import com.jinsol.stockmate.domain.inventory.dto.InventoryResponse;
 import com.jinsol.stockmate.domain.inventory.entity.Inventory;
 import com.jinsol.stockmate.domain.inventory.repository.InventoryRepository;
+import com.jinsol.stockmate.global.exception.EntityNotFoundException;
+import com.jinsol.stockmate.global.exception.InsufficientStockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,7 @@ public class InventoryService {
     //재고 단건 조회
     public InventoryResponse getInventoryByProductId(Long productId){
         Inventory inventory = inventoryRepository.findByProductId(productId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재고입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 재고입니다."));
         return new InventoryResponse(inventory);
     }
 
@@ -35,7 +37,7 @@ public class InventoryService {
     @Transactional
     public InventoryResponse increaseStock(Long inventoryId, InventoryAdjustRequest request){
         Inventory inventory = inventoryRepository.findById(inventoryId)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 재고입니다."));
+                .orElseThrow(()-> new InsufficientStockException("존재하지 않는 재고입니다."));
 
         inventory.increase(request.getAmount());
 
@@ -46,7 +48,7 @@ public class InventoryService {
     @Transactional
     public InventoryResponse decreaseStock(Long inventoryId, InventoryAdjustRequest request) {
         Inventory inventory = inventoryRepository.findById(inventoryId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재고입니다."));
+                .orElseThrow(() -> new InsufficientStockException("존재하지 않는 재고입니다."));
 
         inventory.decrease(request.getAmount());
 

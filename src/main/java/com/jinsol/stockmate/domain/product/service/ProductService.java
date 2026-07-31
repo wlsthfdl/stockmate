@@ -10,6 +10,7 @@ import com.jinsol.stockmate.domain.product.dto.ProductUpdateRequest;
 import com.jinsol.stockmate.domain.product.entity.Product;
 import com.jinsol.stockmate.domain.product.enums.ProductStatus;
 import com.jinsol.stockmate.domain.product.repository.ProductRepository;
+import com.jinsol.stockmate.global.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class ProductService {
     @Transactional
     public ProductResponse createProduct(ProductCreateRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 카테고리입니다."));
 
         Product product = Product.builder()
                 .name(request.getName())
@@ -68,7 +69,7 @@ public class ProductService {
     @Transactional
     public ProductResponse updateProduct(Long productId,  ProductUpdateRequest request) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다."));
 
         if (request.getName() != null) {
             product.changeName(request.getName());
@@ -81,7 +82,7 @@ public class ProductService {
         }
         if (request.getCategoryId() != null) {
             Category category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+                    .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 카테고리입니다."));
             product.changeCategory(category);
         }
         return new ProductResponse(product);
@@ -91,7 +92,7 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long productId){
         Product product = productRepository.findById(productId)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 상품입니다."));
+                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 상품입니다."));
         productRepository.delete(product);
     }
 }
