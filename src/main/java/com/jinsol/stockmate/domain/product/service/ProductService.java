@@ -54,7 +54,7 @@ public class ProductService {
     //상품 단건 조회
     public ProductResponse getProduct(Long productId){
         Product product = productRepository.findById(productId)
-        .orElseThrow(()-> new IllegalArgumentException(""));
+        .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 상품입니다."));
 
         return new ProductResponse(product);
     }
