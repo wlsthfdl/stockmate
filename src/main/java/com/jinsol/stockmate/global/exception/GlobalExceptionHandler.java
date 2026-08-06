@@ -38,4 +38,9 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("서버 오류가 발생했습니다."));
     }
 
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateEmail(DuplicateEmailException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(e.getMessage()));
+    }
 }
