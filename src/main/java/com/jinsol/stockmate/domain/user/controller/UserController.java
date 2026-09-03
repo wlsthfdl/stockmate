@@ -1,5 +1,7 @@
 package com.jinsol.stockmate.domain.user.controller;
 
+import com.jinsol.stockmate.domain.user.dto.TokenResponse;
+import com.jinsol.stockmate.domain.user.dto.UserLoginRequest;
 import com.jinsol.stockmate.domain.user.dto.UserResponse;
 import com.jinsol.stockmate.domain.user.dto.UserSignupRequest;
 import com.jinsol.stockmate.domain.user.service.UserService;
@@ -24,5 +26,12 @@ public class UserController {
     public ResponseEntity<UserResponse> signup(@Valid @RequestBody UserSignupRequest request){
         UserResponse response = userService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    //로그인
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody UserLoginRequest request) {
+        TokenResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
     }
 }

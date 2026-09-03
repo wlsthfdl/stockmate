@@ -24,7 +24,7 @@ public class JwtProvider {
     }
 
     //토큰 생성
-    public String createToeken(String email){
+    public String createToken(String email){
         Date now = new Date();
         Date expiryDate = new Date(now.getTime()+expiration);
 
