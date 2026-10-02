@@ -2,9 +2,13 @@ package com.jinsol.stockmate.domain.order.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderItemRequest {
 
     @NotNull(message = "상품 ID는 필수입니다.")
