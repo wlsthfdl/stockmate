@@ -2,6 +2,7 @@ package com.jinsol.stockmate.domain.inventory.entity;
 
 import com.jinsol.stockmate.domain.product.entity.Product;
 import com.jinsol.stockmate.global.common.BaseEntity;
+import com.jinsol.stockmate.global.exception.InsufficientStockException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -47,7 +48,7 @@ public class Inventory extends BaseEntity {
 
     public void decrease (int amount){
         if(this.quantity < amount){
-            throw new IllegalStateException("재고가 부족합니다.");
+            throw new InsufficientStockException("재고가 부족합니다.");
         }
         this.quantity -= amount;
     }

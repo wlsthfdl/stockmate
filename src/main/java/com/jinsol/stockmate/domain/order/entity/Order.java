@@ -60,4 +60,8 @@ public class Order extends BaseEntity {
         this.orderItems.add(orderItem);
         orderItem.assignOrder(this);
     }
+
+    public void changeTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 }
