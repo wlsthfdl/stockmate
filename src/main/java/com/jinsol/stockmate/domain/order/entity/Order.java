@@ -3,6 +3,7 @@ package com.jinsol.stockmate.domain.order.entity;
 import com.jinsol.stockmate.domain.order.enums.OrderStatus;
 import com.jinsol.stockmate.domain.user.entity.User;
 import com.jinsol.stockmate.global.common.BaseEntity;
+import com.jinsol.stockmate.global.exception.InvalidOrderStatusException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -51,8 +52,12 @@ public class Order extends BaseEntity {
         this.currency = currency;
     }
 
-    public void changeStatus(OrderStatus status){
-        this.status = status;
+    public void changeStatus(OrderStatus next){
+        if(!this.status.canTransitionTo(next)){
+            throw new InvalidOrderStatusException(
+                    "주문 상태를 " + this.status + "에서 " + next + "(으)로 변경할 수 없습니다.");
+        }
+        this.status = next;
     }
 
     //연관관계 편의 메서드
@@ -63,5 +68,13 @@ public class Order extends BaseEntity {
 
     public void changeTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public void cancel() {
+        if (!this.status.canCancel()) {
+            throw new InvalidOrderStatusException(
+                    this.status + " 상태의 주문은 취소할 수 없습니다.");
+        }
+        this.status = OrderStatus.CANCELED;
     }
 }
