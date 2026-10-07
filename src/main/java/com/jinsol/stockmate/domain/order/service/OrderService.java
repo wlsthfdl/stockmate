@@ -105,4 +105,17 @@ public class OrderService {
 
         return new OrderResponse(order);
     }
+
+    public OrderResponse getOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 주문입니다."));
+
+        return new OrderResponse(order);
+    }
+
+    public List<OrderResponse> getOrders() {
+        return orderRepository.findAll().stream()
+                .map(OrderResponse::new)
+                .toList();
+    }
 }
