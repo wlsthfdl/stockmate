@@ -45,8 +45,11 @@ public class OrderService {
                 .build();
 
         int totalPrice = 0;
+        List<OrderItemRequest> sortedItems = request.getItems().stream()
+                .sorted(Comparator.comparing(OrderItemRequest::getProductId))
+                .toList();
 
-        for (OrderItemRequest itemRequest : request.getItems()) {
+        for (OrderItemRequest itemRequest : sortedItems) {
             Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다."));
 
@@ -74,7 +77,7 @@ public class OrderService {
 
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findWithLockById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 주문입니다."));
 
         order.changeStatus(request.getStatus());   // 전이 규칙 검증은 엔티티가 처리
