@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -56,6 +58,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse("접근 권한이 없습니다."));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

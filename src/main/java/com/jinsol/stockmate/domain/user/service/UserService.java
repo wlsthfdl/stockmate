@@ -35,7 +35,7 @@ public class UserService {
         User user = User.builder().email(request.getEmail())
                 .password(encodedPassword)
                 .name(request.getName())
-                .role(Role.ADMIN)
+                .role(Role.USER)
                 .build();
         User savedUser = userRepository.save(user);
         return new UserResponse(savedUser);
@@ -50,7 +50,7 @@ public class UserService {
             throw new InvalidCredentialsException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtProvider.createToken(user.getEmail());
+        String token = jwtProvider.createToken(user.getEmail(), user.getRole().name());
         return new TokenResponse(token);
     }
 }

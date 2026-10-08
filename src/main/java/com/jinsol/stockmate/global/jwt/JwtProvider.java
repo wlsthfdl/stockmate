@@ -24,12 +24,13 @@ public class JwtProvider {
     }
 
     //토큰 생성
-    public String createToken(String email){
+    public String createToken(String email, String role){
         Date now = new Date();
         Date expiryDate = new Date(now.getTime()+expiration);
 
         return Jwts.builder()
                 .subject(email)
+                .claim("role", role)        //권한 정보 저장
                 .issuedAt(now)      //발급 시각
                 .expiration(expiryDate)     //만료 시각
                 .signWith(secretKey)        //비밀키 서명
@@ -46,6 +47,15 @@ public class JwtProvider {
         return claims.getSubject();
     }
 
+    //토큰에서 권한 추출
+    public String getRole(String token){
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("role", String.class);
+    }
     //토큰 유효성 검증
     public boolean validateToken(String token){
        try{

@@ -12,10 +12,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;   // ← 추가
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
@@ -24,6 +23,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")   // ← 추가
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
             Authentication authentication,
@@ -34,6 +34,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")   // ← 추가
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long orderId,
@@ -41,16 +42,19 @@ public class OrderController {
         return ResponseEntity.ok(orderService.updateOrderStatus(orderId, request));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")   // ← 추가
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.cancelOrder(orderId));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")   // ← 추가
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.getOrder(orderId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")   // ← 추가
     @GetMapping
     public ResponseEntity<PagedModel<OrderResponse>> getOrders(
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
