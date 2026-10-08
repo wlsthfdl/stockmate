@@ -6,6 +6,10 @@ import com.jinsol.stockmate.domain.order.dto.OrderStatusUpdateRequest;
 import com.jinsol.stockmate.domain.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -48,7 +52,8 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> getOrders() {
-        return ResponseEntity.ok(orderService.getOrders());
+    public ResponseEntity<PagedModel<OrderResponse>> getOrders(
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(orderService.getOrders(pageable));
     }
 }

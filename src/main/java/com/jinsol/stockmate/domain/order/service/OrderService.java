@@ -16,6 +16,9 @@ import com.jinsol.stockmate.domain.user.entity.User;
 import com.jinsol.stockmate.domain.user.repository.UserRepository;
 import com.jinsol.stockmate.global.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,16 +109,18 @@ public class OrderService {
         return new OrderResponse(order);
     }
 
+    //주문 1건 조회
     public OrderResponse getOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 주문입니다."));
 
         return new OrderResponse(order);
     }
-
-    public List<OrderResponse> getOrders() {
-        return orderRepository.findAll().stream()
-                .map(OrderResponse::new)
-                .toList();
+    
+    //주문 목록 조회
+    public PagedModel<OrderResponse> getOrders(Pageable pageable) {
+        Page<OrderResponse> page = orderRepository.findAll(pageable)
+                .map(OrderResponse::new);
+        return new PagedModel<>(page);
     }
 }
