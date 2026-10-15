@@ -60,4 +60,13 @@ public class OrderController {
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(orderService.getOrders(pageable));
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping("/me")
+    public ResponseEntity<PagedModel<OrderResponse>> getMyOrders(
+            Authentication authentication,
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(orderService.getMyOrders(email, pageable));
+    }
 }

@@ -123,4 +123,11 @@ public class OrderService {
                 .map(OrderResponse::new);
         return new PagedModel<>(page);
     }
+
+    //내 주문 목록 조회
+    public PagedModel<OrderResponse> getMyOrders(String email, Pageable pageable) {
+        Page<OrderResponse> page = orderRepository.findByUserEmail(email, pageable)
+                .map(OrderResponse::new);
+        return new PagedModel<>(page);
+    }
 }
