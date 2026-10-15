@@ -2,6 +2,7 @@ package com.jinsol.stockmate.global.config;
 
 import com.jinsol.stockmate.global.jwt.JwtAuthenticationFilter;
 import com.jinsol.stockmate.global.jwt.JwtProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +35,13 @@ public class SecurityConfig {
                             .requestMatchers("/users/signup", "/users/login").permitAll()
                             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                             .anyRequest().authenticated()
+                    )
+                    .exceptionHandling(e -> e
+                            .authenticationEntryPoint((request, response, authException) -> {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType("application/json;charset=UTF-8");
+                                response.getWriter().write("{\"message\":\"로그인이 필요합니다.\"}");
+                            })
                     )
                     .addFilterBefore(
                             new JwtAuthenticationFilter(jwtProvider),
