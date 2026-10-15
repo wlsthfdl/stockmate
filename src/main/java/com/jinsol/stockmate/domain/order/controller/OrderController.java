@@ -50,8 +50,10 @@ public class OrderController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")   // ← 추가
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrder(orderId));
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId,
+                                                  Authentication authentication) {
+        return ResponseEntity.ok(orderService.getOrder(orderId, authentication.getName(), isAdmin(authentication)));
+
     }
 
     @PreAuthorize("hasRole('ADMIN')")   // ← 추가
@@ -68,5 +70,11 @@ public class OrderController {
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         String email = authentication.getName();
         return ResponseEntity.ok(orderService.getMyOrders(email, pageable));
+    }
+
+    // 토큰의 권한 목록에 ROLE_ADMIN이 있는지 확인
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }

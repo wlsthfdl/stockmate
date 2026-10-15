@@ -130,4 +130,21 @@ public class OrderService {
                 .map(OrderResponse::new);
         return new PagedModel<>(page);
     }
+
+    //주문 1건 조회 (USER는 본인 주문만, ADMIN은 전체)
+    public OrderResponse getOrder(Long orderId, String email, boolean isAdmin) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 주문입니다."));
+
+        validateAccess(order, email, isAdmin);
+
+        return new OrderResponse(order);
+    }
+
+    // 본인 주문이 아니면 존재 자체를 숨기기 위해 404와 같은 예외를 던짐
+    private void validateAccess(Order order, String email, boolean isAdmin) {
+        if (!isAdmin && !order.isOwnedBy(email)) {
+            throw new EntityNotFoundException("존재하지 않는 주문입니다.");
+        }
+    }
 }

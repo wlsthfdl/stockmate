@@ -77,4 +77,9 @@ public class Order extends BaseEntity {
         }
         this.status = OrderStatus.CANCELED;
     }
+
+    // 이 주문의 주인이 해당 이메일의 사용자인지 확인
+    public boolean isOwnedBy(String email) {
+        return this.user.getEmail().equals(email);
+    }
 }
