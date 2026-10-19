@@ -89,9 +89,10 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse cancelOrder(Long orderId) {
+    public OrderResponse cancelOrder(Long orderId, String email, boolean isAdmin) {
         Order order = orderRepository.findWithLockById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 주문입니다."));
+        validateAccess(order, email, isAdmin);   // 상태 변경 전에 소유자 검사 (본인 외 404)
 
         order.cancel();   // 취소 가능 상태 검증 + 상태 변경 (불가하면 409)
 
@@ -105,14 +106,6 @@ public class OrderService {
                     .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 재고입니다."));
             inventory.increase(item.getQuantity());
         }
-
-        return new OrderResponse(order);
-    }
-
-    //주문 1건 조회
-    public OrderResponse getOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 주문입니다."));
 
         return new OrderResponse(order);
     }

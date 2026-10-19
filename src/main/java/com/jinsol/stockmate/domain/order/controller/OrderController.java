@@ -44,8 +44,11 @@ public class OrderController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")   // ← 추가
     @PostMapping("/{orderId}/cancel")
-    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.cancelOrder(orderId));
+    public ResponseEntity<OrderResponse> cancelOrder(
+            @PathVariable Long orderId,
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                orderService.cancelOrder(orderId, authentication.getName(), isAdmin(authentication)));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")   // ← 추가
