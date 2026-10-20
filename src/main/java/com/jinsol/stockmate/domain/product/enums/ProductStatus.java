@@ -17,4 +17,8 @@ public enum ProductStatus {
         return customerVisible().contains(this);
     }
 
+    // 주문 가능한 상태인지 (판매중만 가능)
+    public boolean isOrderable() {
+        return this == ON_SALE;
+    }
 }

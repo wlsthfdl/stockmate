@@ -15,6 +15,7 @@ import com.jinsol.stockmate.domain.product.repository.ProductRepository;
 import com.jinsol.stockmate.domain.user.entity.User;
 import com.jinsol.stockmate.domain.user.repository.UserRepository;
 import com.jinsol.stockmate.global.exception.EntityNotFoundException;
+import com.jinsol.stockmate.global.exception.InsufficientStockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class OrderService {
     private final InventoryRepository inventoryRepository;
     private final UserRepository userRepository;
 
+    //주문 생성
     @Transactional
     public OrderResponse createOrder(String email, OrderCreateRequest request) {
         User user = userRepository.findByEmail(email)
@@ -55,6 +57,8 @@ public class OrderService {
         for (OrderItemRequest itemRequest : sortedItems) {
             Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다."));
+
+            validateOrderable(product);   // ← 이 줄 추가
 
             // 재고 차감 (Entity의 decrease()가 재고 부족 검증까지 처리)
             // findByProductIdForUpdate : 트랜잭션 안에서 조회한 순간 재고 행에 락이 걸림
@@ -78,6 +82,7 @@ public class OrderService {
         return new OrderResponse(savedOrder);
     }
 
+    //주문 수정
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
         Order order = orderRepository.findWithLockById(orderId)
@@ -88,6 +93,7 @@ public class OrderService {
         return new OrderResponse(order);
     }
 
+    //주문 취소
     @Transactional
     public OrderResponse cancelOrder(Long orderId, String email, boolean isAdmin) {
         Order order = orderRepository.findWithLockById(orderId)
@@ -140,4 +146,15 @@ public class OrderService {
             throw new EntityNotFoundException("존재하지 않는 주문입니다.");
         }
     }
+
+    // 주문 가능한 상품인지 검사 (비공개·삭제는 404, 품절은 409)
+    private void validateOrderable(Product product) {
+        if (!product.getStatus().isVisibleToCustomer()) {
+            throw new EntityNotFoundException("존재하지 않는 상품입니다.");
+        }
+        if (!product.getStatus().isOrderable()) {
+            throw new InsufficientStockException("품절된 상품입니다.");
+        }
+    }
+
 }
