@@ -58,7 +58,7 @@ public class OrderService {
             Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다."));
 
-            validateOrderable(product);   // ← 이 줄 추가
+            validateOrderable(product);
 
             // 재고 차감 (Entity의 decrease()가 재고 부족 검증까지 처리)
             // findByProductIdForUpdate : 트랜잭션 안에서 조회한 순간 재고 행에 락이 걸림
