@@ -82,4 +82,18 @@ public class Product extends BaseEntity {
     public boolean isDeleted() {
         return this.status == ProductStatus.DELETED;
     }
+
+    // 재고 소진 → 판매중이었다면 품절로
+    public void markSoldOut() {
+        if (this.status == ProductStatus.ON_SALE) {
+            this.status = ProductStatus.SOLD_OUT;
+        }
+    }
+
+    // 재입고 → 품절이었다면 판매중으로 (비공개·삭제 상품은 그대로)
+    public void markRestocked() {
+        if (this.status == ProductStatus.SOLD_OUT) {
+            this.status = ProductStatus.ON_SALE;
+        }
+    }
 }

@@ -35,7 +35,7 @@ public class ProductService {
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .currency(request.getCurrency())
-                .status(ProductStatus.ON_SALE)
+                .status(ProductStatus.SOLD_OUT)     //재고는 0으로 생성되므로 품절에서 시작(입고 시 자동 판매시작)
                 .category(category)
                 .build();
 

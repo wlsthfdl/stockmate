@@ -44,6 +44,9 @@ public class Inventory extends BaseEntity {
     //행위 기반 수정 API를 위함(검증 포함. 캡슐화)
     public void increase(int amount){
         this.quantity += amount;
+        if(this.quantity > 0) {
+            this.product.markRestocked();   //품절 상품이면 판매 재개
+        }
     }
 
     public void decrease (int amount){
@@ -51,5 +54,8 @@ public class Inventory extends BaseEntity {
             throw new InsufficientStockException("재고가 부족합니다.");
         }
         this.quantity -= amount;
+        if (this.quantity == 0) {
+            this.product.markSoldOut();     // 재고 소진 시 품절 처리
+        }
     }
 }
