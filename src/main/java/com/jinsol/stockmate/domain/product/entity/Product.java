@@ -73,4 +73,13 @@ public class Product extends BaseEntity {
     public void changeCategory(Category category) {
         this.category = category;
     }
+
+    // 소프트 삭제: 행은 남기고 상태만 DELETED로 변경 (과거 주문 기록 보존)
+    public void delete() {
+        this.status = ProductStatus.DELETED;
+    }
+
+    public boolean isDeleted() {
+        return this.status == ProductStatus.DELETED;
+    }
 }

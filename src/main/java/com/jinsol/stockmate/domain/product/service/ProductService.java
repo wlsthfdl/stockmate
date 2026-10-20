@@ -53,23 +53,20 @@ public class ProductService {
 
     //상품 단건 조회
     public ProductResponse getProduct(Long productId){
-        Product product = productRepository.findById(productId)
-        .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 상품입니다."));
-
+        Product product = findActiveProduct(productId);
         return new ProductResponse(product);
     }
 
     //상품 목록 조회
     public java.util.List<ProductResponse> getProducts(){
-        return productRepository.findAll().stream().
+        return productRepository.findByStatusNot(ProductStatus.DELETED).stream().
                 map(ProductResponse::new).toList();
     }
 
     //상품 수정
     @Transactional
     public ProductResponse updateProduct(Long productId,  ProductUpdateRequest request) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다."));
+        Product product = findActiveProduct(productId);
 
         if (request.getName() != null) {
             product.changeName(request.getName());
@@ -91,8 +88,18 @@ public class ProductService {
     //상품 삭제
     @Transactional
     public void deleteProduct(Long productId){
+        Product product = findActiveProduct(productId);
+        product.delete();       //상태만 deleted로 바꿈
+
+    }
+
+    // 상품조회 삭제된 상품은 존재하지 않는 것으로 취급 (404)
+    private Product findActiveProduct(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 상품입니다."));
-        productRepository.delete(product);
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다."));
+        if (product.isDeleted()) {
+            throw new EntityNotFoundException("존재하지 않는 상품입니다.");
+        }
+        return product;
     }
 }
