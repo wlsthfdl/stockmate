@@ -13,4 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     //특정 상태를 제외하고 조회(삭제된 상품 제외)
     List<Product> findByStatusNot(ProductStatus status);
+
+    // 지정한 상태들만 조회 (USER용 목록)
+    List<Product> findByStatusIn(List<ProductStatus> statuses);
 }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,17 +32,18 @@ public class ProductController {
     //상품 단건 조회
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long productId){
-        ProductResponse response = productService.getProduct(productId);
-        return ResponseEntity.ok(response);     //200 + body
+    public ResponseEntity<ProductResponse> getProduct(
+            @PathVariable Long productId,
+            Authentication authentication){
+        return ResponseEntity.ok(productService.getProduct(productId, isAdmin(authentication)));
     }
 
     //상품 목록 조회
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getProducts(){
-        List<ProductResponse> responses= productService.getProducts();
-        return ResponseEntity.ok(responses);
+    public ResponseEntity<List<ProductResponse>> getProducts(Authentication authentication){
+        return ResponseEntity.ok(productService.getProducts(isAdmin(authentication)));
+
     }
 
     //상품 수정
@@ -61,5 +63,10 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId){
         productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();       //204 + body없음
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }

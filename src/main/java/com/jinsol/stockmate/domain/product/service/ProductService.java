@@ -52,15 +52,22 @@ public class ProductService {
     }
 
     //상품 단건 조회
-    public ProductResponse getProduct(Long productId){
+    public ProductResponse getProduct(Long productId,  boolean isAdmin){
         Product product = findActiveProduct(productId);
+        if (!isAdmin && !product.getStatus().isVisibleToCustomer()) {
+            throw new EntityNotFoundException("존재하지 않는 상품입니다.");
+        }
         return new ProductResponse(product);
     }
 
     //상품 목록 조회
-    public java.util.List<ProductResponse> getProducts(){
-        return productRepository.findByStatusNot(ProductStatus.DELETED).stream().
-                map(ProductResponse::new).toList();
+    public java.util.List<ProductResponse> getProducts(boolean isAdmin){
+        java.util.List<Product> products = isAdmin
+                ? productRepository.findByStatusNot(ProductStatus.DELETED)
+                : productRepository.findByStatusIn(ProductStatus.customerVisible());
+        return products.stream()
+                .map(ProductResponse::new)
+                .toList();
     }
 
     //상품 수정
