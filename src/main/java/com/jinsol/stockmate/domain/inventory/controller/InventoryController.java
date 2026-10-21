@@ -6,6 +6,7 @@ import com.jinsol.stockmate.domain.inventory.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,7 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/inventories")
 @RequiredArgsConstructor
-public class inventoryController {
+@PreAuthorize("hasRole('ADMIN')")
+public class InventoryController {
 
     private final InventoryService inventoryService;
 
@@ -30,7 +32,7 @@ public class inventoryController {
     }
 
     //입고처리
-    @PostMapping("{inventoryId}/increase")
+    @PostMapping("/{inventoryId}/increase")
     public  ResponseEntity<InventoryResponse> increaseStock(
            @PathVariable Long inventoryId,
            @Valid @RequestBody InventoryAdjustRequest request){
