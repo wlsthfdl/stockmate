@@ -65,6 +65,20 @@ public class ProductController {
         return ResponseEntity.noContent().build();       //204 + body없음
     }
 
+    //상품 비공개
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{productId}/hide")
+    public ResponseEntity<ProductResponse> hideProduct(@PathVariable Long productId){
+        return ResponseEntity.ok(productService.hideProduct(productId));
+    }
+
+    //상품 공개
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{productId}/show")
+    public ResponseEntity<ProductResponse> showProduct(@PathVariable Long productId){
+        return ResponseEntity.ok(productService.showProduct(productId));
+    }
+
     private boolean isAdmin(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));

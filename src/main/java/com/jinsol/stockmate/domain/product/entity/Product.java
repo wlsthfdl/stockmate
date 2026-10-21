@@ -96,4 +96,18 @@ public class Product extends BaseEntity {
             this.status = ProductStatus.ON_SALE;
         }
     }
+
+    // 비공개 처리 (이미 비공개여도 그대로 성공 - 멱등)
+    public void hide() {
+        this.status = ProductStatus.HIDDEN;
+    }
+
+    // 공개 처리: HIDDEN 상품만 대상, 재고 유무에 따라 판매중/품절 결정
+    public void show(boolean inStock) {
+        if (this.status != ProductStatus.HIDDEN) {
+            return;   // 이미 공개 상태면 아무것도 안 함 (멱등)
+        }
+        this.status = inStock ? ProductStatus.ON_SALE : ProductStatus.SOLD_OUT;
+    }
+
 }

@@ -100,6 +100,25 @@ public class ProductService {
 
     }
 
+    //상품 비공개
+    @Transactional
+    public ProductResponse hideProduct(Long productId) {
+        Product product = findActiveProduct(productId);
+        product.hide();
+        return new ProductResponse(product);
+    }
+
+    //상품 공개 (재고에 따라 판매중/품절)
+    @Transactional
+    public ProductResponse showProduct(Long productId) {
+        Product product = findActiveProduct(productId);
+        Inventory inventory = inventoryRepository.findByProductIdForUpdate(productId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 재고입니다."));
+        product.show(inventory.getQuantity() > 0);
+        return new ProductResponse(product);
+    }
+
+
     // 상품조회 삭제된 상품은 존재하지 않는 것으로 취급 (404)
     private Product findActiveProduct(Long productId) {
         Product product = productRepository.findById(productId)
