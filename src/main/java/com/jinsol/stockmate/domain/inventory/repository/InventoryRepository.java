@@ -17,4 +17,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("select i from Inventory i where i.product.id = :productId")
     Optional<Inventory> findByProductIdForUpdate(@Param("productId") Long productId);
 
+    // 재고 id로 조회 + 행 락 (관리자 입고·출고용)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Inventory> findWithLockById(Long inventoryId);
 }

@@ -5,7 +5,6 @@ import com.jinsol.stockmate.domain.inventory.dto.InventoryResponse;
 import com.jinsol.stockmate.domain.inventory.entity.Inventory;
 import com.jinsol.stockmate.domain.inventory.repository.InventoryRepository;
 import com.jinsol.stockmate.global.exception.EntityNotFoundException;
-import com.jinsol.stockmate.global.exception.InsufficientStockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,11 +32,11 @@ public class InventoryService {
                 .toList();
     }
 
-    //입고처리
+    //입고처리 (재고 행 락: 주문 처리와 동시에 실행될 때 갱신 손실 방지)
     @Transactional
     public InventoryResponse increaseStock(Long inventoryId, InventoryAdjustRequest request){
-        Inventory inventory = inventoryRepository.findById(inventoryId)
-                .orElseThrow(()-> new InsufficientStockException("존재하지 않는 재고입니다."));
+        Inventory inventory = inventoryRepository.findWithLockById(inventoryId)
+                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 재고입니다."));
 
         inventory.increase(request.getAmount());
 
@@ -47,8 +46,8 @@ public class InventoryService {
     // 출고 처리
     @Transactional
     public InventoryResponse decreaseStock(Long inventoryId, InventoryAdjustRequest request) {
-        Inventory inventory = inventoryRepository.findById(inventoryId)
-                .orElseThrow(() -> new InsufficientStockException("존재하지 않는 재고입니다."));
+        Inventory inventory = inventoryRepository.findWithLockById(inventoryId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 재고입니다."));
 
         inventory.decrease(request.getAmount());
 
