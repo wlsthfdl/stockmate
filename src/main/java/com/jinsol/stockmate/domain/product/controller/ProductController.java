@@ -1,5 +1,6 @@
 package com.jinsol.stockmate.domain.product.controller;
 
+import static com.jinsol.stockmate.global.security.SecurityUtils.isAdmin;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.jinsol.stockmate.domain.product.dto.ProductCreateRequest;
 import com.jinsol.stockmate.domain.product.dto.ProductResponse;
@@ -79,8 +80,4 @@ public class ProductController {
         return ResponseEntity.ok(productService.showProduct(productId));
     }
 
-    private boolean isAdmin(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    }
 }

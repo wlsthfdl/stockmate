@@ -1,5 +1,6 @@
 package com.jinsol.stockmate.domain.order.controller;
 
+import static com.jinsol.stockmate.global.security.SecurityUtils.isAdmin;
 import com.jinsol.stockmate.domain.order.dto.OrderCreateRequest;
 import com.jinsol.stockmate.domain.order.dto.OrderResponse;
 import com.jinsol.stockmate.domain.order.dto.OrderStatusUpdateRequest;
@@ -75,9 +76,4 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getMyOrders(email, pageable));
     }
 
-    // 토큰의 권한 목록에 ROLE_ADMIN이 있는지 확인
-    private boolean isAdmin(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    }
 }
