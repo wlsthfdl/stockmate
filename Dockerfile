@@ -18,5 +18,10 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 ENV TZ=Asia/Seoul
 COPY --from=build /app/build/libs/*.jar app.jar
+
+# root 대신 권한이 제한된 일반 사용자로 실행 (보안)
+RUN groupadd --system app && useradd --system --gid app app
+USER app
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
