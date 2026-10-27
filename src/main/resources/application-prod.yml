@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update      # Flyway 도입 후 validate로 변경 예정
+    show-sql: false
+
+jwt:
+  secret: ${JWT_SECRET}

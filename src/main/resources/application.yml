@@ -1,20 +1,15 @@
 spring:
   application:
     name: stockmate
+  profiles:
+    default: local       # 프로필을 따로 지정하지 않으면 local로 실행 (IntelliJ, 테스트)
 
   datasource:
-    url: jdbc:mysql://localhost:3306/stockmate?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: stockmate
-    password: stockmate1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
         default_batch_fetch_size: 100
     open-in-view: false
 
@@ -22,5 +17,4 @@ server:
   port: 8080
 
 jwt:
-  secret: stockmate-secrect-key-for-jwt-token-generation-please-change-this-in-production
   expiration: 86400000      # 24시간(밀리초 단위)
