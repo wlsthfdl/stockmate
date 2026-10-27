@@ -2,9 +2,13 @@ package com.jinsol.stockmate.domain.inventory.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class InventoryAdjustRequest {
 
     @NotNull(message = "수량은 필수입니다.")

@@ -2,8 +2,10 @@ package com.jinsol.stockmate.domain.order.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.jinsol.stockmate.domain.category.entity.Category;
 import com.jinsol.stockmate.domain.category.repository.CategoryRepository;
+import com.jinsol.stockmate.domain.inventory.dto.InventoryAdjustRequest;
 import com.jinsol.stockmate.domain.inventory.entity.Inventory;
 import com.jinsol.stockmate.domain.inventory.repository.InventoryRepository;
+import com.jinsol.stockmate.domain.inventory.service.InventoryService;
 import com.jinsol.stockmate.domain.order.dto.OrderCreateRequest;
 import com.jinsol.stockmate.domain.order.dto.OrderItemRequest;
 import com.jinsol.stockmate.domain.order.dto.OrderResponse;
@@ -35,6 +37,7 @@ public class OrderConcurrencyTest {
     @Autowired private ProductRepository productRepository;
     @Autowired private InventoryRepository inventoryRepository;
     @Autowired private UserRepository userRepository;
+    @Autowired private InventoryService inventoryService;
 
     private Product product;
     private User user;
@@ -166,4 +169,55 @@ public class OrderConcurrencyTest {
         assertEquals(OrderStatus.CANCELED, finalOrder.getStatus());
     }
 
+    @Test
+    void 관리자_출고와_주문이_동시에_일어나도_재고_차감이_누락되지_않는다() throws InterruptedException {
+        // 준비: 재고 5 → 100
+        Inventory inventory = inventoryRepository.findByProductId(product.getId()).orElseThrow();
+        inventory.increase(95);
+        inventoryRepository.save(inventory);
+        Long inventoryId = inventory.getId();
+
+        int threadCount = 100; // 주문 50 + 관리자 출고 50
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        AtomicInteger successCount = new AtomicInteger();
+        AtomicInteger unexpectedCount = new AtomicInteger();
+
+        for (int i = 0; i < threadCount; i++) {
+            boolean isOrder = (i % 2 == 0); // 짝수: 손님 주문, 홀수: 관리자 출고 (번갈아 섞어서 제출)
+            executorService.submit(() -> {
+                try {
+                    startLatch.await();
+                    if (isOrder) {
+                        orderService.createOrder(user.getEmail(), new OrderCreateRequest(
+                                List.of(new OrderItemRequest(product.getId(), 1))));
+                    } else {
+                        inventoryService.decreaseStock(inventoryId, new InventoryAdjustRequest(1));
+                    }
+                    successCount.incrementAndGet();
+                } catch (Exception e) {
+                    unexpectedCount.incrementAndGet();
+                    e.printStackTrace();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        startLatch.countDown();
+        latch.await();
+        executorService.shutdown();
+
+        Inventory finalInventory = inventoryRepository.findByProductId(product.getId()).orElseThrow();
+
+        System.out.println("성공 수: " + successCount.get());
+        System.out.println("예외 수: " + unexpectedCount.get());
+        System.out.println("최종 재고: " + finalInventory.getQuantity());
+
+        assertEquals(0, unexpectedCount.get());          // 재고가 딱 맞으니 실패는 없어야 함
+        assertEquals(100, successCount.get());           // 100건 모두 성공
+        assertEquals(0, finalInventory.getQuantity());   // 차감 누락 없이 정확히 0
+    }
 }
