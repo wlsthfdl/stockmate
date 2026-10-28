@@ -3,12 +3,13 @@ package com.jinsol.stockmate.global.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-
+@Slf4j
 @Component
 public class JwtProvider {
     private final SecretKey secretKey;
@@ -56,16 +57,18 @@ public class JwtProvider {
                 .getPayload();
         return claims.get("role", String.class);
     }
+
     //토큰 유효성 검증
     public boolean validateToken(String token){
-       try{
-           Jwts.parser()
-                   .verifyWith(secretKey)
-                   .build()
-                   .parseSignedClaims(token);
-           return true;
-       }catch (Exception e){
-           return false;
-       }
+        try{
+            Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        }catch (Exception e){
+            log.warn("JWT 검증 실패: {} - {}", e.getClass().getSimpleName(), e.getMessage());
+            return false;
+        }
     }
 }
