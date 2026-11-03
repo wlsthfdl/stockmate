@@ -10,8 +10,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
     ports:
-      - "3306:3306"
-    volumes:
+      - "127.0.0.1:3306:3306"   # 이 컴퓨터 안에서만 접속 가능 (외부 차단)    volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:               # MySQL이 "진짜로" 준비됐는지 확인
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
