@@ -4,16 +4,16 @@ services:
     container_name: stockmate-mysql
     restart: always
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      DB_URL: jdbc:mysql://mysql:3306/stockmate?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: stockmate
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
     ports:
-      - "127.0.0.1:3306:3306"   # 이 컴퓨터 안에서만 접속 가능 (외부 차단)    volumes:
+      - "127.0.0.1:3306:3306"   # 이 컴퓨터 안에서만 접속 가능 (외부 차단)
     volumes:
       - mysql-data:/var/lib/mysql
-    healthcheck:               # MySQL이 "진짜로" 준비됐는지 확인
+    healthcheck:                # MySQL이 실제로 준비됐는지 확인
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 3s
@@ -28,9 +28,11 @@ services:
       mysql:
         condition: service_healthy   # DB 준비가 끝난 뒤에 앱 시작
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/stockmate?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/stockmate?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
 
