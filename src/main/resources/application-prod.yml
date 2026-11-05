@@ -11,3 +11,5 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
 
+server:
+  forward-headers-strategy: framework   # Nginx가 넘긴 X-Forwarded-* 헤더로 원래 프로토콜(https)과 접속자 IP 인식
