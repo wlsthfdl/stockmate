@@ -73,25 +73,31 @@ jobs:
           ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
 
       - name: 서버에 배포
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
         run: |
-          ssh -i ~/.ssh/deploy_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            set -e
+          ssh -i ~/.ssh/deploy_key "$EC2_USER@$EC2_HOST" 'bash -se' << 'EOF'
             cd ~/stockmate
             git fetch origin master
             git reset --hard origin/master
             docker compose up -d --build
             docker image prune -f
-
-            echo "앱 응답 확인 중..."
-            for i in $(seq 1 60); do
-              code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/products || true)
-              if [ "$code" = "401" ]; then
-                echo "배포 성공 (응답 코드 $code)"
-                exit 0
-              fi
-              sleep 3
-            done
-            echo "앱이 3분 안에 응답하지 않음"
-            docker compose logs --tail 50 app
-            exit 1
           EOF
+
+      - name: 배포 확인
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          echo "https://$EC2_HOST/products 응답 확인 중..."
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://$EC2_HOST/products" || true)
+            if [ "$code" = "401" ]; then
+              echo "배포 확인 완료 (응답 코드 $code)"
+              exit 0
+            fi
+            echo "대기 중... (응답 코드: $code)"
+            sleep 3
+          done
+          echo "앱이 3분 안에 응답하지 않음"
+          exit 1
